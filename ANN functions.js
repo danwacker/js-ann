@@ -36,7 +36,7 @@ class neuralNetwork{
         this.weights = [];
         this.activations = [];
     }
-    create(shape, activations){
+    create(shape=[], activations=[]){
         for (let i = 0; i < shape.length - 1; i++) {
             let weightLayer = [];
             for (let j = 0; j < shape[i]; j++){
@@ -48,6 +48,15 @@ class neuralNetwork{
             }
             this.weights.push(weightLayer)
         }
+        this.activations = activations;
     }
-    
+    load(file) {
+        
+    }
+    query(inputs) {
+
+    }
+    train(inputs,outputs) {
+
+    }
 }
