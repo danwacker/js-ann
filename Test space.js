@@ -1,15 +1,14 @@
+import {activate} from './ANN_math_functions.js'
+
 function test() {
-wholeArray = [];
-for (let i=0; i<3; i++) {
-    arrayPiece = [];
-    for (let j=0; j<3; j++) {
-        arrayPiece.push(Math.random());
-    }
-    wholeArray.push(arrayPiece);
+    let arr = [
+        -1,
+        3,
+        4
+    ];
+    console.log(arr);
+    console.log(activate(arr,'sigmoid'));
 }
-console.log(wholeArray);
-console.log(wholeArray[0]);
-console.log(wholeArray.length);
-console.log(wholeArray[0].length);
-console.log(wholeArray[2][2])
-}
+console.log('start');
+test();
+console.log('end');

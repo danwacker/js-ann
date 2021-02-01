@@ -1,37 +1,11 @@
-const e = 2.71828
+/* 
+ANN classes for direct use
+written by Dan Wacker
+*/
 
 
-function relu(input) {
-    if (input < 0) {
-        return 0;
-    }
-    return input;
-}
 
-function sigmoid(input) {
-    return 1/(1+e**(-input));
-}
-
-function mult(mat1, mat2) {
-    
-}
-
-
-class neuron{
-    constructor(activation) {
-        this.activation = activation
-    }
-    feedForward(input) {
-        if (this.activation === 'relu') {
-            return relu(input);
-        } else if (this.activation === 'sigmoid') {
-            return sigmoid(input);
-        }
-    }
-
-}
-
-class neuralNetwork{
+class network{
     constructor(){
         this.weights = [];
         this.activations = [];
@@ -46,7 +20,7 @@ class neuralNetwork{
                 }
                 weightLayer.push(weightSection);
             }
-            this.weights.push(weightLayer)
+            this.weights.push(weightLayer);
         }
         this.activations = activations;
     }
@@ -54,7 +28,12 @@ class neuralNetwork{
         
     }
     query(inputs) {
-
+        let result = inputs;
+        for (let i=0; i<this.weights.length; i++) {
+            result = mult(result, weights[i]);
+            result = activate(result);
+        }
+        return result;
     }
     train(inputs,outputs) {
 
