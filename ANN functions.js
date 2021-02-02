@@ -5,37 +5,89 @@ written by Dan Wacker
 
 
 
-class network{
+export class network{
+    //constructor just creates member objects for weights and activations
     constructor(){
         this.weights = [];
         this.activations = [];
     }
+
+    //initializes network with specifications
     create(shape=[], activations=[]){
+        //loop each layer
         for (let i = 0; i < shape.length - 1; i++) {
+            //var for a layer of weights
             let weightLayer = [];
+            //loop through each row
             for (let j = 0; j < shape[i]; j++){
+                //row of weights
                 let weightSection = [];
+                //loop each element
                 for (let k = 0; k < shape[i+1]; k++){
+                    //randomly initialize each weight
                     weightSection.push(Math.random());
                 }
+                //add row to layer
                 weightLayer.push(weightSection);
             }
+            //add layer to weights object
             this.weights.push(weightLayer);
         }
+        //fill activations object
         this.activations = activations;
     }
+
+    //initializes network by loading from file
     load(file) {
         
     }
-    query(inputs) {
-        let result = inputs;
-        for (let i=0; i<this.weights.length; i++) {
-            result = mult(result, weights[i]);
-            result = activate(result);
-        }
-        return result;
-    }
-    train(inputs,outputs) {
+
+    //saves network state to specified file
+    save(file) {
 
     }
-}
+    
+    //simple query function just needs inputs, gives you outputs
+    query(inputs) {
+        //initialize results
+        let result = inputs;
+        //loop through each layer
+        for (let i=0; i<this.weights.length; i++) {
+            //apply weights
+            result = mult(result, weights[i]);
+            //apply activation functions
+            result = activate(result, this.activations[i]);
+        }
+        //return variable after every layer of weighting/activating
+        return result;
+    }
+
+    //training function. requires inputs and outputs and a training factor
+    train(inputs, outputs, factor) {
+        //record outputs of input layer (the inputs)
+        let layerOutputs = [inputs];
+        //loop through each layer
+        for (let i=0; i<this.weights.length; i++) {
+            layerInputs.push(mult(layerOutputs[i],this.weights[i]));
+            layerOutputs.push(activate(layerInputs[i], this.activations[i]));
+        }
+        //calculate output error
+        let error = [sub(outputs,layerOutputs.pop())];
+        //loop through every layer
+        for (let i=this.weights.length-1; i>=0; i--) {
+            //backprop error before adjusting weights
+            let prevError = mult(transpose(this.weights[i]),error);
+            //find activation derivatives for layer
+            derivs = activeDeriv(layerInputs[i],this.activations[i]);
+            //loop through each weight in a layer
+            for (let j=0; j<this.weights[i].length; j++) {
+                for (let k=0; k<this.weights[i][0].length; k++) {
+                    //weight adjustment scheme
+                    this.weights[i][j][k] = this.weights[i][j][k] + factor * error[i][k] * derivs[k] * layerOutputs[i][j];
+                }
+            }
+            //replace with backpropped error and do it again
+            error = prevError;
+        }
+    }
+} 

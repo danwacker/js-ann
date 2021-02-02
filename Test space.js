@@ -6,8 +6,12 @@ function test() {
         3,
         4
     ];
-    console.log(arr);
-    console.log(activate(arr,'sigmoid'));
+    let arr1 = [
+        2,
+        3,
+        8
+    ]
+    console.log(arr-arr1);
 }
 console.log('start');
 test();
