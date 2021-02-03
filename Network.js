@@ -4,7 +4,7 @@ written by Dan Wacker
 */
 
 let fs = require('fs');
-let ANNmath = require('./ANN_math_functions.js');
+let ANNmath = require('./ANNmath.js');
 
 //class responsible for 
 module.exports = class network{
@@ -61,7 +61,7 @@ module.exports = class network{
     //simple query function just needs inputs, gives you outputs
     query(inputs) {
         //initialize results
-        let result = inputs;
+        let result = ANNmath.transpose(inputs);
         //loop through each layer
         for (let i=0; i<this.weights.length; i++) {
             //apply weights
@@ -76,7 +76,7 @@ module.exports = class network{
     //training function. requires inputs and outputs and a training factor
     train(inputs, outputs, factor) {
         //record outputs of input layer (the inputs)
-        let layerOutputs = [inputs];
+        let layerOutputs = [ANNmath.transpose(inputs)];
         //create layer input matrix
         let layerInputs = [];
         //loop through each layer
