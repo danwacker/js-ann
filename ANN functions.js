@@ -3,17 +3,19 @@ ANN classes for direct use
 written by Dan Wacker
 */
 
+let fs = require('fs');
+let ANNmath = require('./ANN_math_functions.js');
 
-
-export class network{
+//class responsible for 
+module.exports = class network{
     //constructor just creates member objects for weights and activations
-    constructor(){
+    constructor() {
         this.weights = [];
         this.activations = [];
     }
 
     //initializes network with specifications
-    create(shape=[], activations=[]){
+    create(shape=[], activations=[]) {
         //loop each layer
         for (let i = 0; i < shape.length - 1; i++) {
             //var for a layer of weights
@@ -39,12 +41,21 @@ export class network{
 
     //initializes network by loading from file
     load(file) {
-        
+        file = './' + file;
+        let loader = require(file);
+        this.weights = loader.weights;
+        this.activations = loader.activations;
     }
 
     //saves network state to specified file
     save(file) {
-
+        let saver = {
+            weights : this.weights,
+            activations : this.activations 
+        };
+        fs.writeFileSync(file, JSON.stringify(saver), err => {
+            if (err) throw err;
+        });
     }
     
     //simple query function just needs inputs, gives you outputs
@@ -54,9 +65,9 @@ export class network{
         //loop through each layer
         for (let i=0; i<this.weights.length; i++) {
             //apply weights
-            result = mult(result, weights[i]);
+            result = ANNmath.mult(result, this.weights[i]);
             //apply activation functions
-            result = activate(result, this.activations[i]);
+            result = ANNmath.activate(result, this.activations[i]);
         }
         //return variable after every layer of weighting/activating
         return result;
@@ -66,28 +77,30 @@ export class network{
     train(inputs, outputs, factor) {
         //record outputs of input layer (the inputs)
         let layerOutputs = [inputs];
+        //create layer input matrix
+        let layerInputs = [];
         //loop through each layer
         for (let i=0; i<this.weights.length; i++) {
-            layerInputs.push(mult(layerOutputs[i],this.weights[i]));
-            layerOutputs.push(activate(layerInputs[i], this.activations[i]));
+            layerInputs.push(ANNmath.mult(layerOutputs[i],this.weights[i]));
+            layerOutputs.push(ANNmath.activate(layerInputs[i], this.activations[i]));
         }
         //calculate output error
-        let error = [sub(outputs,layerOutputs.pop())];
+        let error = [ANNmath.sub(outputs,layerOutputs.pop())];
         //loop through every layer
         for (let i=this.weights.length-1; i>=0; i--) {
             //backprop error before adjusting weights
-            let prevError = mult(transpose(this.weights[i]),error);
+            let prevError = ANNmath.mult((this.weights[i]),error);
             //find activation derivatives for layer
-            derivs = activeDeriv(layerInputs[i],this.activations[i]);
+            let derivs = ANNmath.activeDeriv(layerInputs[i][0],this.activations[i]);
             //loop through each weight in a layer
             for (let j=0; j<this.weights[i].length; j++) {
                 for (let k=0; k<this.weights[i][0].length; k++) {
                     //weight adjustment scheme
-                    this.weights[i][j][k] = this.weights[i][j][k] + factor * error[i][k] * derivs[k] * layerOutputs[i][j];
+                    this.weights[i][j][k] = this.weights[i][j][k] + factor * error[k] * derivs[k] * layerOutputs[i][0][j];
                 }
             }
             //replace with backpropped error and do it again
             error = prevError;
         }
     }
-} 
+}
