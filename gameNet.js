@@ -3,16 +3,14 @@ ANNmath = require('./ANNmath.js');
 draw = require('./visuals.js');
 step = require('./gameFunctions.js');
 
-const board = document.getElementById("gameCanvas");
-const canv = board.getContext("2d");
-const gameNet = new Network;
 
-function newNetwork(netfile, net) {
+
+exports.newNetwork = (netfile, net) => {
     net.create([8,120,120,120,3],[relu,relu,relu,relu]);
     net.save(netfile);
 }
 
-function exhibition(netfile, net, canv) {
+exports.exhibition = (netfile, net, canv) => {
     net.load(netfile);
     state = NewGame(canv);
     exhibitionStep(state, net);
@@ -37,7 +35,7 @@ function NewGame(canv) {
     return state;
 }
 
-function learn(netfile, iterations, net, canv) {
+exports.learn = (iterations, netfile, net, canv) => {
     net.load(netfile)
     for (let i=0; i<iterations; i++) {
         state = NewGame(canv);
@@ -47,7 +45,7 @@ function learn(netfile, iterations, net, canv) {
     net.save(netfile)
 }
 
-function blindLearn(netfile, iterations, net) {
+exports.blindLearn = (netfile, iterations, net) => {
     net.load(netfile)
     for (let i=0; i<iterations; i++) {
         state = NewGame();
