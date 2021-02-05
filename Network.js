@@ -3,11 +3,11 @@ ANN classes for direct use
 written by Dan Wacker
 */
 
-let fs = require('fs');
-let ANNmath = require('./ANNmath.js');
-
+ANNmath = require('./ANNmath.js');
+fs = require(fs);
+exports = network;
 //class responsible for 
-module.exports = class network{
+class network{
     //constructor just creates member objects for weights and activations
     constructor() {
         this.weights = [];
@@ -42,7 +42,7 @@ module.exports = class network{
     //initializes network by loading from file
     load(file) {
         file = './' + file;
-        let loader = require(file);
+        let loader = fs.readfile(file);
         this.weights = loader.weights;
         this.activations = loader.activations;
     }

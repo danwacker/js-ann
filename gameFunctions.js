@@ -1,6 +1,6 @@
 //general game functions
 
-exports = step;
+exports = step
 
 function step(state) {
     changeDirection(state);
