@@ -1,3 +1,5 @@
+const { stat } = require('fs');
+
 Network = require('./Network.js');
 ANNmath = require('./ANNmath.js');
 draw = require('./visuals.js');
