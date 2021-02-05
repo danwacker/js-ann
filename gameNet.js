@@ -1,16 +1,18 @@
-Network = require('./Network.js');
-ANNmath = require('./ANNmath.js');
-draw = require('./visuals.js');
-step = require('./gameFunctions.js');
+//Network = require('./Network.js');
+//ANNmath = require('./ANNmath.js');
+//draw = require('./visuals.js');
+//step = require('./gameFunctions.js');
+import {sub} from './ANNmath.js';
+import {draw} from './visuals.js';
+import {step} from './gameFunctions.js';
 
 
-
-exports.newNetwork = (netfile, net) => {
-    net.create([8,120,120,120,3],[relu,relu,relu,relu]);
+export function newNetwork(netfile, net) {
+    net.create([8,120,120,120,3],['relu','relu','relu','relu']);
     net.save(netfile);
 }
 
-exports.exhibition = (netfile, net, canv) => {
+export function exhibition(netfile, net, canv) {
     net.load(netfile);
     state = NewGame(canv);
     exhibitionStep(state, net);
@@ -35,7 +37,7 @@ function NewGame(canv) {
     return state;
 }
 
-exports.learn = (iterations, netfile, net, canv) => {
+export function learn(iterations, netfile, net, canv) {
     net.load(netfile)
     for (let i=0; i<iterations; i++) {
         state = NewGame(canv);
@@ -45,7 +47,7 @@ exports.learn = (iterations, netfile, net, canv) => {
     net.save(netfile)
 }
 
-exports.blindLearn = (netfile, iterations, net) => {
+export function blindLearn(netfile, iterations, net) {
     net.load(netfile)
     for (let i=0; i<iterations; i++) {
         state = NewGame();
@@ -98,7 +100,7 @@ function badTrain(path, state, net, canv) {
                 state.direction = decode(decisionCode);
                 step(state);
                 draw(canv);
-                net.train(netInput(state), ANNmath.sub([1,1,1],decisionCode), negFactor/path.length);
+                net.train(netInput(state), sub([1,1,1],decisionCode), negFactor/path.length);
                 badTrain(path, state, net, canv);
         }, 100);
     }
@@ -120,7 +122,7 @@ function blindExecutePlan(state, net) {
             let decisionCode = path.pop()
             state.direction = decode(decisionCode);
             step(state);
-            net.train(netInput(state), ANNmath.sub([1,1,1],decisionCode), negFactor/path.length);
+            net.train(netInput(state), sub([1,1,1],decisionCode), negFactor/path.length);
         }
     }
 }

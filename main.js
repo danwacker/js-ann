@@ -1,5 +1,7 @@
 //gameNet = require('./gameNet.js');
 //Network = require('./Network.js');
+import {network} from "./Network.js"
+import {newNetwork, exhibition, learn} from "./gameNet.js"
 
 const netfile = 'snakeNet00.json';
 const board = document.getElementById("gameCanvas");
