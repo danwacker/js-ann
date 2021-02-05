@@ -8,10 +8,8 @@ const snake_border = 'darkblue';
 const food_col = 'red';
 const food_border = 'yellow';
 
-exports = draw;
-
 //exported complete draw function
-function draw(canv,state) {
+export function draw(canv,state) {
     clearBoard(canv);
     drawSnake(canv,state.snake);
     drawFood(canv,state.food);

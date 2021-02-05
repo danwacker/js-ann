@@ -1,8 +1,6 @@
 //general game functions
 
-exports = step
-
-function step(state) {
+export function step(state) {
     changeDirection(state);
     moveSnake(state);
     makeFood(state);
