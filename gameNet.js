@@ -1,10 +1,6 @@
-//Network = require('./Network.js');
-//ANNmath = require('./ANNmath.js');
-//draw = require('./visuals.js');
-//step = require('./gameFunctions.js');
-import {sub} from './ANNmath.js';
-import {draw} from './visuals.js';
-import {step} from './gameFunctions.js';
+ANNmath = require('./ANNmath.js');
+draw = require('./visuals.js');
+step = require('./gameFunctions.js');
 
 
 export function newNetwork(netfile, net) {
@@ -100,7 +96,7 @@ function badTrain(path, state, net, canv) {
                 state.direction = decode(decisionCode);
                 step(state);
                 draw(canv);
-                net.train(netInput(state), sub([1,1,1],decisionCode), negFactor/path.length);
+                net.train(netInput(state), ANNmath.sub([1,1,1],decisionCode), negFactor/path.length);
                 badTrain(path, state, net, canv);
         }, 100);
     }
@@ -122,7 +118,7 @@ function blindExecutePlan(state, net) {
             let decisionCode = path.pop()
             state.direction = decode(decisionCode);
             step(state);
-            net.train(netInput(state), sub([1,1,1],decisionCode), negFactor/path.length);
+            net.train(netInput(state), ANNmath.sub([1,1,1],decisionCode), negFactor/path.length);
         }
     }
 }
