@@ -9,6 +9,25 @@ const staticBasePath = './'
 
 
 http.createServer(function(req, res) {
+    if (req.method === 'POST') {
+        var resolvedBase = path.resolve(staticBasePath);
+        var safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
+        var fileLoc = path.join(resolvedBase, safeSuffix);
+        console.log('POST: ' + fileLoc);
+
+        let body = '';
+        req.on('data', function (data) {
+            body += data;
+        });
+        
+        console.log('post body: ' + req.body);
+        fs.writeFile(fileLoc, body, (err) => {
+            if (err){
+                throw err;
+            }
+        });
+
+    } else {
     var resolvedBase = path.resolve(staticBasePath);
     var safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
     var fileLoc = path.join(resolvedBase, safeSuffix);
@@ -23,6 +42,6 @@ http.createServer(function(req, res) {
     });
 
     res.writeHeader(200, {"Content-Type": mime.getType(req.url)});
-    stream.pipe(res);
-    
+    stream.pipe(res);}
+
 }).listen(PORT);

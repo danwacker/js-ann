@@ -8,10 +8,11 @@ export function newNetwork(netfile, net) {
     net.save(netfile);
 }
 
-export function exhibition(netfile, net, canv) {
-    net.load(netfile);
-    state = NewGame(canv);
-    exhibitionStep(state, net);
+export function exhibition(net, canv, status) {
+    let state = NewGame(canv);
+    exhibitionStep(canv, state, net, function() {
+        status.flag = false;
+    });
 }
 
 function NewGame(canv) {
@@ -36,7 +37,7 @@ function NewGame(canv) {
 export function learn(iterations, netfile, net, canv) {
     net.load(netfile)
     for (let i=0; i<iterations; i++) {
-        state = NewGame(canv);
+        let state = NewGame(canv);
         executePlan(state, net, canv);
         while (state.running){}
     }
@@ -46,21 +47,24 @@ export function learn(iterations, netfile, net, canv) {
 export function blindLearn(netfile, iterations, net) {
     net.load(netfile)
     for (let i=0; i<iterations; i++) {
-        state = NewGame();
+        let state = NewGame();
         while (state.running){
             blindExecutePlan(state, net);
         }
     }
     net.save(netfile);
-}
+}  
 
-function exhibitionStep(state, net) {
+function exhibitionStep(canv, state, net, _callback) {
     if(state.running) {
         setTimeout(function onTick() {
-            state.direction = decode(networkDecision(state, net));
+            let decisionCode = networkDecision(state, net);
+            state.decision = decode(decisionCode);
             step(state);
             draw(canv, state);
-            exhibitionStep(state,net);
+            exhibitionStep(canv, state,net, function() {
+                _callback();
+            });
         }, 100);
     }
 }
@@ -175,8 +179,11 @@ function setNetworkPlan(state, net) {
 }
 
 function networkDecision(state, net) {
-    results = net.query(netInput(state));
+    let results = net.query(netInput(state))[0];
     let decisionCode;
+    console.log(results[0]);
+    console.log(results[1]);
+    console.log(results[2]);
     if ((results[0] > results[1]) && (results[0] > results[2])) {
         decisionCode = [1,0,0];
     } else if (results[1] > results[2]) {
@@ -184,6 +191,7 @@ function networkDecision(state, net) {
     } else {
         decisionCode = [0,0,1];
     }
+    console.log(decisionCode);
     return decisionCode;
 }
 
@@ -204,7 +212,7 @@ function netInput(state) {
         danger.S = danger.S || (state.snake[0].y === state.snake[i].y+10);
         danger.W = danger.W || (state.snake[0].x === state.snake[i].x+10);
     }
-    input = [
+    let input = [
         state.food.x/400 - state.snake[0].x/400,
         state.food.y/400 - state.snake[0].y/400,
         state.v.x/10,

@@ -19,13 +19,15 @@ export function draw(canv,state) {
 function clearBoard(canv) {
     canv.fillStyle = board_background;
     canv.strokeStyle = board_border;
-    canv.fillRect(0, 0, snakeboard.width, snakeboard.height);
-    canv.strokeRect(0, 0, snakeboard.width, snakeboard.height);
+    canv.fillRect(0, 0, 400, 400);
+    canv.strokeRect(0, 0, 400, 400);
 }
 
 //draws complete snake
 function drawSnake(canv, snake) {
-    snake.forEach(canv, drawSnakePart);
+    for (let i=0; i<snake.length; i++) {
+        drawSnakePart(canv,snake[i]);
+    }
 }
 
 //draws piece of snake

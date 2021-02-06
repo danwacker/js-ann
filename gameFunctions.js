@@ -30,7 +30,7 @@ function makeFood(state) {
 }
 
 function foodCheck(state) {
-    onBody = state.snake.find(function foodOnSnake(piece) {
+    let onBody = state.snake.find(function foodOnSnake(piece) {
         return piece.x === state.food.x && piece.y === state.food.y;
         });
     return onBody === undefined;
@@ -40,7 +40,7 @@ function foodCheck(state) {
 
 function loseCheck(state) {
     let gameOver = false;
-    for (let i = 1; i < snake.length; i++) {
+    for (let i = 1; i < state.snake.length; i++) {
         gameOver = gameOver || (state.snake[0].x === state.snake[i].x && state.snake[0].y === state.snake[i].y)
     }
     gameOver = gameOver || state.snake[0].x < 0;
@@ -51,17 +51,17 @@ function loseCheck(state) {
 }
 
 function changeDirection(state) {
-        if (state.decision === RIGHT) {
+        if (state.decision === 'RIGHT') {
             if (state.v.x === 0) {
-                state.v = {x: v.y, y: 0};
+                state.v = {x: state.v.y, y: 0};
             } else {
-                state.v = {x: 0, y: -v.x};
+                state.v = {x: 0, y: -state.v.x};
             }
-        } else if (state.decision === LEFT) {
+        } else if (state.decision === 'LEFT') {
             if (state.v.x === 0) {
-                state.v = {x: -v.y, y: 0};
+                state.v = {x: -state.v.y, y: 0};
             } else {
-                state.v = {x: 0, y: v.x};
+                state.v = {x: 0, y: state.v.x};
             }
         }
 }

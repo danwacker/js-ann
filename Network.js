@@ -4,13 +4,13 @@ written by Dan Wacker
 */
 
 import {sub, mult, transpose, activate, activeDeriv} from './ANNmath.js';
-fs = require(fs);
 //class responsible for 
 export class network{
     //constructor just creates member objects for weights and activations
     constructor() {
         this.weights = [];
         this.activations = [];
+        this.loaded = false;
     }
 
     //initializes network with specifications
@@ -26,7 +26,7 @@ export class network{
                 //loop each element
                 for (let k = 0; k < shape[i+1]; k++){
                     //randomly initialize each weight
-                    weightSection.push(Math.random());
+                    weightSection.push(Math.random()/shape[i]);
                 }
                 //add row to layer
                 weightLayer.push(weightSection);
@@ -36,25 +36,29 @@ export class network{
         }
         //fill activations object
         this.activations = activations;
+        this.loaded = true;
     }
 
     //initializes network by loading from file
-    load(file) {
-        file = './' + file;
-        let loader = fs.readfile(file);
-        this.weights = loader.weights;
-        this.activations = loader.activations;
+    load(filename) {
+        loadnetwork(this,filename);
     }
 
     //saves network state to specified file
-    save(file) {
+    save(filename) {
         let saver = {
             weights : this.weights,
             activations : this.activations 
         };
-        fs.writeFileSync(file, JSON.stringify(saver), err => {
-            if (err) throw err;
-        });
+        let xhttp = new XMLHttpRequest();
+        xhttp.open(
+            'POST',
+            filename,
+            true
+        );
+        xhttp.setRequestHeader('Content-Type','text/plain')
+        xhttp.send(JSON.stringify(saver));
+        
     }
     
     //simple query function just needs inputs, gives you outputs
@@ -102,4 +106,24 @@ export class network{
             error = prevError;
         }
     }
+}
+
+function loadnetwork(net, filename) {
+    net.loaded = false;
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                let loader = JSON.parse(xhttp.response);
+                net.weights = loader.weights;
+                net.activations = loader.activations;
+                net.loaded = true;
+                console.log('Network Loaded From File');
+            }
+        }
+        xhttp.open(
+            'GET',
+            filename,
+            true
+        );
+        xhttp.send();
 }
