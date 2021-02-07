@@ -26,7 +26,7 @@ export class network{
                 //loop each element
                 for (let k = 0; k < shape[i+1]; k++){
                     //randomly initialize each weight
-                    weightSection.push(Math.random()/shape[i]);
+                    weightSection.push(Math.random()*2/shape[i]);
                 }
                 //add row to layer
                 weightLayer.push(weightSection);
@@ -88,18 +88,22 @@ export class network{
             layerOutputs.push(activate(layerInputs[i], this.activations[i]));
         }
         //calculate output error
-        let error = [sub(outputs,layerOutputs.pop())];
+        let error = sub([outputs], layerOutputs.pop());
         //loop through every layer
         for (let i=this.weights.length-1; i>=0; i--) {
             //backprop error before adjusting weights
-            let prevError = mult((this.weights[i]),error);
+            let prevError = mult(error,transpose(this.weights[i]));
             //find activation derivatives for layer
             let derivs = activeDeriv(layerInputs[i][0],this.activations[i]);
             //loop through each weight in a layer
             for (let j=0; j<this.weights[i].length; j++) {
                 for (let k=0; k<this.weights[i][0].length; k++) {
                     //weight adjustment scheme
-                    this.weights[i][j][k] = this.weights[i][j][k] + factor * error[k] * derivs[k] * layerOutputs[i][0][j];
+                    // console.log('weight: ' + this.weights[i][j][k]);
+                    // console.log('factor: ' + factor);
+                    // console.log('dervis: ' + derivs[k]);
+                    // console.log('layerOutputs: ' + layerOutputs[i][0][j]);
+                    this.weights[i][j][k] = this.weights[i][j][k] + factor * error[0][k] * derivs[k] * layerOutputs[i][0][j];
                 }
             }
             //replace with backpropped error and do it again
@@ -117,7 +121,6 @@ function loadnetwork(net, filename) {
                 net.weights = loader.weights;
                 net.activations = loader.activations;
                 net.loaded = true;
-                console.log('Network Loaded From File');
             }
         }
         xhttp.open(

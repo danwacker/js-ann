@@ -8,6 +8,7 @@ const PORT = 8081;
 const staticBasePath = 'C:/Users/Dan/Documents/Code Projects/HTML/ANN/';
 
 app.use(bodyParser.text({limit: '100mb', type: "text/plain"}));
+// app.use(bodyParser.json({limit: '100mb'}));
 
 app.get('/', (req, res) => {
     let resolvedBase = path.resolve(staticBasePath);

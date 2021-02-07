@@ -1,27 +1,13 @@
-ANNmath = require('./ANNmath.js');
-network = require('./Network.js');
+import {network} from './Network.js';
 function test() {
     let net = new network();
-    net.create([3,3,3,3,1],['relu','relu','relu','relu']);
-    let result = net.query([1, 0, 1]);
-    console.log('initial result: ' + result);
-    for (let i=0; i < 100 ; i++) {
-        net.train([1,0,1],[5],0.01);
-        result = net.query([1, 0, 1]);
-        console.log('training round ' + i + ' result ' + result + ' out of 5');
-        net.train([0,0,1],[1],0.01);
-        result = net.query([0, 0, 1]);
-        console.log('training round ' + i + ' result ' + result + ' out of 1');
-    }
-    net.save('net.json');
-    let net2 = new network();
-    net2.load('net.json');
-    result = net2.query([1, 0, 1]);
-    console.log('reload result ' + result + ' out of 5');
-    result = net2.query([0, 0, 1]);
-    console.log('reload result ' + result + ' out of 1');
-
+    net.create([9,120,120,120,3],['relu','relu','relu','relu']);
+    let result = net.query([-0.3, -0.5, -1, 0, 0, 1, 0, 0, 0]);
+    result = net.train([0.4, -0.10000000000000003, 0, 1, 0, 0, 1, 1, 0],[0, 1, 1], 0.016666666666666666);
+    result = net.train([0.4, -0.10000000000000003, 0, 1, 0, 0, 1, 1, 0],[0, 1, 1], 0.016666666666666666);
+    result = net.query([-0.3, -0.5, -1, 0, 0, 1, 0, 0, 0]);
+    console.table(result);
 }
 console.log('start');
-//test();
+test();
 console.log('end');

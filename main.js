@@ -1,18 +1,24 @@
 import {newNetwork, exhibition, learn} from './gameNet.js';
 import {network} from './Network.js';
 
-const netfile = 'snakeNet00.json';
+const netfile = 'snakeNet01.json';
 const board = document.getElementById("gameCanvas");
+const teller = document.getElementById("teller");
 const canv = board.getContext("2d");
 const snakeNet = new network;
 let status = {
-    flag : false
+    flag : false,
+    running : false
 };
 
 let commandlist = [];
-commandlist.unshift('create network');
 commandlist.unshift('load network');
-commandlist.unshift('exhibition');
+for (let j=0; j<10; j++) {
+for (let i=0; i<100; i++) {
+    commandlist.unshift('learn');
+}
+commandlist.unshift('save network');
+}
 
 handler();
 
@@ -30,20 +36,24 @@ function handler() {
                 snakeNet.load(netfile);
                 break;
             case 'exhibition':
-                console.log(snakeNet.weights.length);
+                status.running = true;
                 exhibition(snakeNet, canv, status);
                 break;
             case 'learn':
-                learn(snakeNet, canv, status);
+                status.running = true;
+                learn(snakeNet, canv, status, teller);
                 break;
+            case 'save network':
+                snakeNet.save(netfile);
+                status.flag = false;
 
         }
     }
     if (!(commandlist.length === 0)) {
-        console.log('loaded: ' + snakeNet.loaded);
-        status.flag = !(snakeNet.loaded);
+        if (!status.running) {
+            status.flag = !(snakeNet.loaded);
+        }
         setTimeout(function() {
-            console.log('status: ' + status.flag)
             handler();
         }, 100);
     } else {
