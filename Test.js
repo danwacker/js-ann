@@ -1,13 +1,19 @@
 import {network} from './Network.js';
+import {sub} from './ANNmath.js';
 function test() {
     let net = new network();
-    net.create([9,120,120,120,3],['relu','relu','relu','relu']);
-    let result = net.query([-0.3, -0.5, -1, 0, 0, 1, 0, 0, 0]);
-    result = net.train([0.4, -0.10000000000000003, 0, 1, 0, 0, 1, 1, 0],[0, 1, 1], 0.016666666666666666);
-    result = net.train([0.4, -0.10000000000000003, 0, 1, 0, 0, 1, 1, 0],[0, 1, 1], 0.016666666666666666);
-    result = net.query([-0.3, -0.5, -1, 0, 0, 1, 0, 0, 0]);
-    console.table(result);
+    net.load('errornet.json');
+    let result = net.query([0.4, 0.65, 0, 0, 0, 1, 0, 0, 0]);
+    console.log(result);
+    console.log(net.weights[0]);
 }
 console.log('start');
-test();
+// test();
+try {
+    // test();
+    let result = sub([0,1,1],[0,0,0]);
+    console.log(result);
+} catch(err) {
+    console.log(err);
+}
 console.log('end');

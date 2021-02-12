@@ -1,7 +1,14 @@
-import {newNetwork, exhibition, learn} from './gameNet.js';
+import {newNetwork, exhibition, learn, blindLearn} from './gameNet.js';
 import {network} from './Network.js';
 
-const netfile = 'snakeNet01.json';
+
+const epochs = 5;
+const rounds = 20;
+const trainingtype = 'learn';
+const neworload = 'load network';
+const netfile = 'snakeNet02.json';
+
+
 const board = document.getElementById("gameCanvas");
 const teller = document.getElementById("teller");
 const canv = board.getContext("2d");
@@ -12,15 +19,22 @@ let status = {
 };
 
 let commandlist = [];
-commandlist.unshift('load network');
-for (let j=0; j<10; j++) {
-for (let i=0; i<100; i++) {
-    commandlist.unshift('learn');
+commandlist.unshift(neworload);
+for (let j=0; j<epochs; j++) {
+for (let i=0; i<rounds; i++) {
+    commandlist.unshift(trainingtype);
 }
 commandlist.unshift('save network');
 }
 
-handler();
+try{
+    handler();
+} catch(err) {
+    console.log(err);
+    let netout = snakeNet.query(err);
+    console.log(netout);
+    console.log(snakeNet.weights);
+}
 
 function handler() {
     if (!(status.flag)) {
@@ -28,7 +42,7 @@ function handler() {
         let command = commandlist.pop();
         console.log('Next command: ' + command);
         switch(command) {
-            case 'create network':
+            case 'new network':
                 newNetwork(netfile, snakeNet);
                 status.flag = false;
                 break;
@@ -46,7 +60,13 @@ function handler() {
             case 'save network':
                 snakeNet.save(netfile);
                 status.flag = false;
-
+                break;
+            case 'blind learn':
+                blindLearn(snakeNet);
+                break;
+            default:
+                throw 'invalid command';
+            break;
         }
     }
     if (!(commandlist.length === 0)) {
@@ -54,8 +74,15 @@ function handler() {
             status.flag = !(snakeNet.loaded);
         }
         setTimeout(function() {
-            handler();
-        }, 100);
+            try {
+                handler();
+            } catch {
+                commandlist.push('load network');
+                status.flag = false;
+                handler();
+            }
+            
+        }, 10);
     } else {
         console.log('command list completed');
     }

@@ -134,7 +134,7 @@ export function activeDeriv(input,activation) {
     switch(activation) {
     case 'relu':
         for (let i=0; i<input.length;i++) {
-            result[i] = (result[i] > 0) ? 1 : 0;
+            result[i] = (result[i] > 0) ? 1 : 0.05;
         }
     break;
     case 'sigmoid':
@@ -151,7 +151,7 @@ export function activeDeriv(input,activation) {
 
 //rectified linear activation unit
 function relu(input) {
-    return (input < 0) ? 0 : input;
+    return (input < 0) ? (0.05*input) : input;
 }
 
 //sigmoid activation

@@ -73,7 +73,7 @@ export class network{
             result = activate(result, this.activations[i]);
         }
         //return variable after every layer of weighting/activating
-        return result;
+        return result[0];
     }
 
     //training function. requires inputs and outputs and a training factor
@@ -88,7 +88,18 @@ export class network{
             layerOutputs.push(activate(layerInputs[i], this.activations[i]));
         }
         //calculate output error
-        let error = sub([outputs], layerOutputs.pop());
+        let finalout = layerOutputs.pop();
+        let error = sub([outputs], finalout);
+        if (error[0][0] > 100) {
+        console.log(layerInputs[layerInputs.length-1]);
+        console.log(finalout);
+        console.log([outputs]);
+        console.log(error);
+        console.log(sub([outputs], finalout));
+        console.log(outputs[0] - finalout[0][0]);
+        console.log(outputs[1] - finalout[0][1]);
+        console.log(outputs[2] - finalout[0][2]);
+        }
         //loop through every layer
         for (let i=this.weights.length-1; i>=0; i--) {
             //backprop error before adjusting weights
@@ -99,10 +110,6 @@ export class network{
             for (let j=0; j<this.weights[i].length; j++) {
                 for (let k=0; k<this.weights[i][0].length; k++) {
                     //weight adjustment scheme
-                    // console.log('weight: ' + this.weights[i][j][k]);
-                    // console.log('factor: ' + factor);
-                    // console.log('dervis: ' + derivs[k]);
-                    // console.log('layerOutputs: ' + layerOutputs[i][0][j]);
                     this.weights[i][j][k] = this.weights[i][j][k] + factor * error[0][k] * derivs[k] * layerOutputs[i][0][j];
                 }
             }

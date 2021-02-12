@@ -1,15 +1,32 @@
 import {sub, transpose} from './ANNmath.js';
 import {draw} from './visuals.js';
 import {step} from './gameFunctions.js';
+import { network } from './Network.js';
 
 
 export function newNetwork(netfile, net) {
-    net.create([9,120,120,120,3],['relu','relu','relu','relu']);
+    net.create([9,120,120,120,120,3],['relu','relu','relu','relu','relu']);
     net.save(netfile);
 }
 
+export function blindLearn(net) {
+    let state = NewGame();
+    let path = [];
+    let gotFood = false;
+    while (state.running) {
+        if (path.length > 0) {
+                pathTrain(gotFood, path, state, net);
+        } else {
+            let plan = choosePlan(state, net, teller);
+            path = plan.path;
+            gotFood = plan.gotFood;
+        }
+    }
+}
+
 export function exhibition(net, canv, status) {
-    let state = NewGame(canv);
+    let state = NewGame();
+    draw(canv, state);
     exhibitionStep(canv, state, net, function() {
         status.flag = false;
         status.running = false;
@@ -17,7 +34,8 @@ export function exhibition(net, canv, status) {
 }
 
 export function learn(net, canv, status, teller) {
-    let state = NewGame(canv);
+    let state = NewGame();
+    draw(canv, state);
     executePlan(teller, [], false, state, net, canv, function() {
         status.flag = false;
         status.running = false;
@@ -45,11 +63,12 @@ function exhibitionStep(canv, state, net, _callback) {
 function executePlan(teller, path, gotFood, state, net, canv, _callback) {
     if (path.length > 0) {
         setTimeout(function onTick() {
-            pathTrain(gotFood, path, state, net, canv);
+            pathTrain(gotFood, path, state, net);
+            draw(canv, state);
             executePlan(teller, path, gotFood, state, net, canv, function() {
                 _callback();
             });
-        }, 100);
+        }, 50);
     } else if (state.running) {
         let plan = choosePlan(state, net, teller);
         executePlan(teller, plan.path, plan.gotFood, state, net, canv, function() {
@@ -60,22 +79,48 @@ function executePlan(teller, path, gotFood, state, net, canv, _callback) {
     }
 }
 
-function pathTrain(gotFood, path, state, net, canv) {
+function pathTrain(gotFood, path, state, net) {
     let decisionCode = path.pop()
     state.decision = decode(decisionCode);
+    let input = netInput(state);
     step(state);
-    draw(canv, state);
-    let factor = 0.01;
-    if (path.length<3) {
-    if (!gotFood) {
-        decisionCode = transpose(sub([1,1,1],decisionCode));
-        decisionCode = decisionCode[0];
-        factor = 0.2;
+    let factor = 0.001;
+    if (path.length===0) {
+        if (!gotFood) {
+            decisionCode = transpose(sub([1,1,1],decisionCode));
+            decisionCode = decisionCode[0];
+            factor = 0.01;
+        } else {
+            factor = 0.01;
+        }
+        for (let i=0; i<100; i++) {
+            net.train(input, decisionCode, (factor));
+        }
     } else {
-        factor = 0.2;
+        if (state.v.x===10) {
+            if ((state.food.x - state.snake[0].x) < 0) {
+                decisionCode = transpose(sub([1,1,1],decisionCode));
+                decisionCode = decisionCode[0];
+            }
+        } else if (state.v.y===10) {
+            if ((state.food.y - state.snake[0].y) < 0) {
+                decisionCode = transpose(sub([1,1,1],decisionCode));
+                decisionCode = decisionCode[0];
+            }
+        } else if (state.v.x===-10) {
+            if ((state.food.x - state.snake[0].x) > 0) {
+                decisionCode = transpose(sub([1,1,1],decisionCode));
+                decisionCode = decisionCode[0];
+            }
+        } else if (state.v.y===-10) {
+            if ((state.food.y - state.snake[0].y) > 0) {
+                decisionCode = transpose(sub([1,1,1],decisionCode));
+                decisionCode = decisionCode[0];
+            }
+        }
+        net.train(input, decisionCode, (factor));
     }
-    }
-    net.train(netInput(state), decisionCode, (factor));
+    
 }
 
 function choosePlan(state, net, teller) {
@@ -146,10 +191,10 @@ function setNetworkPlan(state, net) {
 }
 
 function networkDecision(state, net) {
-    let results = net.query(netInput(state))[0];
+    let results = net.query(netInput(state));
     let decisionCode;
     if (isNaN(results[0])) {
-        console.log('network returned nan results');
+        throw 'network returned nan';
     }
     if ((results[0] > results[1]) && (results[0] > results[2])) {
         decisionCode = [1,0,0];
@@ -217,7 +262,7 @@ function decode(decisionCode) {
     return decision;
 }
 
-function NewGame(canv) {
+function NewGame() {
     let state = {
         running : true,
 	    eaten : true,
@@ -252,38 +297,6 @@ function NewGame(canv) {
         state.snake[i].x = 100 + 10*head.x - i*state.v.x;
         state.snake[i].y = 100 + 10*head.y - i*state.v.y;
     }
-    draw(canv, state);
     return state;
 }
 
-export function blindLearn(netfile, iterations, net) {
-    net.load(netfile)
-    for (let i=0; i<iterations; i++) {
-        let state = NewGame();
-        while (state.running){
-            blindExecutePlan(state, net);
-        }
-    }
-    net.save(netfile);
-}
-
-function blindExecutePlan(state, net) {
-    let plan = choosePlan(state, net);
-    let path = plan.path;
-    let gotFood = plan.gotFood;
-    if (gotFood) {
-        while (path.length > 0) {
-            let decisionCode = path.pop()
-            state.direction = decode(decisionCode);
-            step(state);
-            net.train(netInput(state), decisionCode, posFactor/path.length);
-        }
-    } else {
-        while (path.length > 0) {
-            let decisionCode = path.pop()
-            state.direction = decode(decisionCode);
-            step(state);
-            net.train(netInput(state), sub([1,1,1],decisionCode), negFactor/path.length);
-        }
-    }
-}
