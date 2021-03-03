@@ -3,10 +3,10 @@ import {network} from './Network.js';
 
 
 const epochs = 5;
-const rounds = 20;
-const trainingtype = 'learn';
+const rounds = 100000;
+const trainingtype = 'blind learn';
 const neworload = 'load network';
-const netfile = 'snakeNet02.json';
+const netfile = 'snakeNet00.json';
 
 
 const board = document.getElementById("gameCanvas");
@@ -27,14 +27,7 @@ for (let i=0; i<rounds; i++) {
 commandlist.unshift('save network');
 }
 
-try{
-    handler();
-} catch(err) {
-    console.log(err);
-    let netout = snakeNet.query(err);
-    console.log(netout);
-    console.log(snakeNet.weights);
-}
+handler();
 
 function handler() {
     if (!(status.flag)) {
@@ -76,7 +69,8 @@ function handler() {
         setTimeout(function() {
             try {
                 handler();
-            } catch {
+            } catch(err) {
+                console.log(err);
                 commandlist.push('load network');
                 status.flag = false;
                 handler();

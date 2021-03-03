@@ -89,36 +89,36 @@ function pathTrain(gotFood, path, state, net) {
         if (!gotFood) {
             decisionCode = transpose(sub([1,1,1],decisionCode));
             decisionCode = decisionCode[0];
-            factor = 0.01;
+            factor = 0.001;
         } else {
-            factor = 0.01;
+            factor = 0.001;
         }
-        for (let i=0; i<100; i++) {
+        for (let i=0; i<10; i++) {
             net.train(input, decisionCode, (factor));
         }
-    } else {
-        if (state.v.x===10) {
-            if ((state.food.x - state.snake[0].x) < 0) {
-                decisionCode = transpose(sub([1,1,1],decisionCode));
-                decisionCode = decisionCode[0];
-            }
-        } else if (state.v.y===10) {
-            if ((state.food.y - state.snake[0].y) < 0) {
-                decisionCode = transpose(sub([1,1,1],decisionCode));
-                decisionCode = decisionCode[0];
-            }
-        } else if (state.v.x===-10) {
-            if ((state.food.x - state.snake[0].x) > 0) {
-                decisionCode = transpose(sub([1,1,1],decisionCode));
-                decisionCode = decisionCode[0];
-            }
-        } else if (state.v.y===-10) {
-            if ((state.food.y - state.snake[0].y) > 0) {
-                decisionCode = transpose(sub([1,1,1],decisionCode));
-                decisionCode = decisionCode[0];
-            }
-        }
-        net.train(input, decisionCode, (factor));
+    // } else {
+    //     if (state.v.x===10) {
+    //         if ((state.food.x - state.snake[0].x) < 0) {
+    //             decisionCode = transpose(sub([1,1,1],decisionCode));
+    //             decisionCode = decisionCode[0];
+    //         }
+    //     } else if (state.v.y===10) {
+    //         if ((state.food.y - state.snake[0].y) < 0) {
+    //             decisionCode = transpose(sub([1,1,1],decisionCode));
+    //             decisionCode = decisionCode[0];
+    //         }
+    //     } else if (state.v.x===-10) {
+    //         if ((state.food.x - state.snake[0].x) > 0) {
+    //             decisionCode = transpose(sub([1,1,1],decisionCode));
+    //             decisionCode = decisionCode[0];
+    //         }
+    //     } else if (state.v.y===-10) {
+    //         if ((state.food.y - state.snake[0].y) > 0) {
+    //             decisionCode = transpose(sub([1,1,1],decisionCode));
+    //             decisionCode = decisionCode[0];
+    //         }
+    //     }
+    //         net.train(input, decisionCode, (factor));
     }
     
 }
