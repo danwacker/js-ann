@@ -3,9 +3,10 @@ ANN classes for direct use
 written by Dan Wacker
 */
 
-import {sub, mult, transpose, activate, activeDeriv} from './ANNmath.js';
+const ANNmath = require('./ANNmath.js');
+const fs = require('fs');
 //class responsible for 
-export class network{
+class network{
     //constructor just creates member objects for weights and activations
     constructor() {
         this.weights = [];
@@ -41,7 +42,9 @@ export class network{
 
     //initializes network by loading from file
     load(filename) {
-        loadnetwork(this,filename);
+        let loader = JSON.parse(require(filename));
+        this.weights = loader.weights;
+        this.activations = loader.activations;
     }
 
     //saves network state to specified file
@@ -50,27 +53,19 @@ export class network{
             weights : this.weights,
             activations : this.activations 
         };
-        let xhttp = new XMLHttpRequest();
-        xhttp.open(
-            'POST',
-            filename,
-            true
-        );
-        xhttp.setRequestHeader('Content-Type','text/plain')
-        xhttp.send(JSON.stringify(saver));
-        
+        fs.writeFile(filename, JSON.stringify(saver));
     }
     
     //simple query function just needs inputs, gives you outputs
     query(inputs) {
         //initialize results
-        let result = transpose(inputs);
+        let result = ANNmath.transpose(inputs);
         //loop through each layer
         for (let i=0; i<this.weights.length; i++) {
             //apply weights
-            result = mult(result, this.weights[i]);
+            result = ANNmath.mult(result, this.weights[i]);
             //apply activation functions
-            result = activate(result, this.activations[i]);
+            result = ANNmath.activate(result, this.activations[i]);
         }
         //return variable after every layer of weighting/activating
         return result[0];
@@ -79,23 +74,23 @@ export class network{
     //training function. requires inputs and outputs and a training factor
     train(inputs, outputs, factor) {
         //record outputs of input layer (the inputs)
-        let layerOutputs = [transpose(inputs)];
+        let layerOutputs = [ANNmath.transpose(inputs)];
         //create layer input matrix
         let layerInputs = [];
         //loop through each layer
         for (let i=0; i<this.weights.length; i++) {
-            layerInputs.push(mult(layerOutputs[i],this.weights[i]));
-            layerOutputs.push(activate(layerInputs[i], this.activations[i]));
+            layerInputs.push(ANNmath.mult(layerOutputs[i],this.weights[i]));
+            layerOutputs.push(ANNmath.activate(layerInputs[i], this.activations[i]));
         }
         //calculate output error
         let finalout = layerOutputs.pop();
-        let error = sub([outputs], finalout);
+        let error = ANNmath.sub([outputs], finalout);
         if (error[0][0] > 100) {
         console.log(layerInputs[layerInputs.length-1]);
         console.log(finalout);
         console.log([outputs]);
         console.log(error);
-        console.log(sub([outputs], finalout));
+        console.log(ANNmath.sub([outputs], finalout));
         console.log(outputs[0] - finalout[0][0]);
         console.log(outputs[1] - finalout[0][1]);
         console.log(outputs[2] - finalout[0][2]);
@@ -103,9 +98,9 @@ export class network{
         //loop through every layer
         for (let i=this.weights.length-1; i>=0; i--) {
             //backprop error before adjusting weights
-            let prevError = mult(error,transpose(this.weights[i]));
+            let prevError = ANNmath.mult(error,ANNmath.transpose(this.weights[i]));
             //find activation derivatives for layer
-            let derivs = activeDeriv(layerInputs[i][0],this.activations[i]);
+            let derivs = ANNmath.activeDeriv(layerInputs[i][0],this.activations[i]);
             //loop through each weight in a layer
             for (let j=0; j<this.weights[i].length; j++) {
                 for (let k=0; k<this.weights[i][0].length; k++) {
@@ -119,21 +114,4 @@ export class network{
     }
 }
 
-function loadnetwork(net, filename) {
-    net.loaded = false;
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                let loader = JSON.parse(xhttp.response);
-                net.weights = loader.weights;
-                net.activations = loader.activations;
-                net.loaded = true;
-            }
-        }
-        xhttp.open(
-            'GET',
-            filename,
-            true
-        );
-        xhttp.send();
-}
+exports = network;

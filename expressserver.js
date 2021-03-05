@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = 8081;
 const staticBasePath = 'C:/Users/Dan/Documents/Code Projects/HTML/ANN/';
+const main = require('handler.js');
 
 app.use(bodyParser.text({limit: '100mb', type: "text/plain"}));
 // app.use(bodyParser.json({limit: '100mb'}));
@@ -50,14 +51,11 @@ app.get('/*', (req, res) => {
 app.post('/*', (req, res) => {
     var resolvedBase = path.resolve(staticBasePath);
         var safeSuffix = path.normalize(req.url).replace(/^(\.\.[\/\\])+/, '');
-        var fileLoc = path.join(resolvedBase, safeSuffix);
-        console.log('POST: ' + fileLoc);
+        var postText = path.join(resolvedBase, safeSuffix);
+        console.log('POST');
 
-        fs.writeFile(fileLoc, req.body, (err) => {
-            if (err){
-                throw err;
-            }
-        });
+        var commandList = JSON.parse(req.body);
+        main(commandList);
 });
 
 app.listen(PORT, () =>{
