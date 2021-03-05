@@ -27,7 +27,7 @@ function checkArray(arr) {
 }
 
 //transpose 1 or 2d arrays
-export function transpose(arr) {
+exports.transpose = (arr) => {
     //check array format/legality
     arr = checkArray(arr);
     let result = [];
@@ -42,7 +42,7 @@ export function transpose(arr) {
 }
 
 //function for multiplying 2 1d or 2d arrays
-export function mult(arr1, arr2) {
+exports.mult = (arr1, arr2) => {
     //loop through array 1 to check legality and formatting
     arr1 = checkArray(arr1);
     //loop through array 2 to check legality and formatting
@@ -78,7 +78,7 @@ export function mult(arr1, arr2) {
 }
 
 //array subtraction
-export function sub(arr1,arr2) {
+exports.sub = (arr1,arr2) => {
 //loop through array 1 to check legality and formatting
 arr1 = checkArray(arr1);
 //loop through array 2 to check legality and formatting
@@ -109,7 +109,7 @@ return result;
 /* neuron activation functions
    relu, sigmoid */
 
-export function activate(input,activation) {
+exports.activate = (input,activation) => {
     let result = input;
     switch(activation) {
     case 'relu':
@@ -129,7 +129,7 @@ export function activate(input,activation) {
     return result;
 }
 
-export function activeDeriv(input,activation) {
+exports.activeDeriv = (input,activation) => {
     let result = input;
     switch(activation) {
     case 'relu':

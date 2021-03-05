@@ -1,44 +1,30 @@
-const gameNet = require('gameNet.js');
-const network = require('Network.js');
-const snakeNet = new network;
+const gameNet = require('./gameNet.js');
+const network = require('./Network.js').network;
 
-function main(commandlist) {
-    const snakeNet = new network;
-    const netfile = 'snakeNet00.json';
-    while (!(commandList.length===0)) {
-        try{
-            let command = commandlist.pop();
-            switch(command) {
-                case 'new network':
-                    gameNet.newNetwork(netfile, snakeNet);
-                    status.flag = false;
-                    break;
-                case 'load network': 
-                    snakeNet.load(netfile);
-                    break;
-                case 'exhibition':
-                    status.running = true;
-                    gameNet.exhibition(snakeNet);
-                    break;
-                case 'learn':
-                    status.running = true;
-                    gameNet.learn(snakeNet);
-                    break;
-                case 'save network':
-                    snakeNet.save(netfile);
-                    status.flag = false;
-                    break;
-                case 'blind learn':
+exports.main = (params) => {
+    const snakeNet = new network();
+    const netfile = './snakeNet00.json';
+    if (params.load) {
+        snakeNet.load(netfile);
+        console.log('network loaded');
+    } else {
+        gameNet.newNetwork(netfile, snakeNet);
+        console.log('new network initiated');
+    }
+
+    if (params.action==='train') {
+        for (let i=0; i<params.epochs; i++) {
+            console.log('epoch: ' + i);
+            for(let j=0; j<params.rounds; j++){
+                try {
                     gameNet.blindLearn(snakeNet);
-                    break;
-                default:
-                    throw 'invalid command';
-                break;
+                } catch(err) {
+                    console.log('Error: ' + err);
+                    gameNet.load(netfile);
+                }
             }
-        } catch(err) {
-            console.log(err);
-            commandlist.push('load network');
+            snakeNet.save(netfile);
         }
+        console.log('Training Complete');
     }
 }
-exports = main;

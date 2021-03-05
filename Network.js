@@ -42,7 +42,7 @@ class network{
 
     //initializes network by loading from file
     load(filename) {
-        let loader = JSON.parse(require(filename));
+        let loader = JSON.parse(fs.readFileSync(filename));
         this.weights = loader.weights;
         this.activations = loader.activations;
     }
@@ -53,7 +53,13 @@ class network{
             weights : this.weights,
             activations : this.activations 
         };
-        fs.writeFile(filename, JSON.stringify(saver));
+        fs.writeFileSync(filename, JSON.stringify(saver), (err) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log('save successful')
+            }
+        });
     }
     
     //simple query function just needs inputs, gives you outputs
@@ -114,4 +120,4 @@ class network{
     }
 }
 
-exports = network;
+exports.network = network;

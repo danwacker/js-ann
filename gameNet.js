@@ -1,6 +1,5 @@
 ANNmath = require('./ANNmath.js');
-draw = require('./visuals.js');
-step = require('./gameFunctions.js');
+step = require('./gameFunctions.js').step;
 network = require('./Network.js');
 
 
@@ -17,7 +16,7 @@ exports.blindLearn = (net) => {
         if (path.length > 0) {
                 pathTrain(gotFood, path, state, net);
         } else {
-            let plan = choosePlan(state, net, teller);
+            let plan = choosePlan(state, net);
             path = plan.path;
             gotFood = plan.gotFood;
         }
@@ -45,34 +44,34 @@ function pathTrain(gotFood, path, state, net) {
     let factor = 0.001;
     if (path.length===0) { 
         if (!gotFood) {
-            decisionCode = transpose(sub([1,1,1],decisionCode));
+            decisionCode = ANNmath.transpose(ANNmath.sub([1,1,1],decisionCode));
             decisionCode = decisionCode[0];
             factor = 0.001;
         } else {
             factor = 0.001;
         }
-        for (let i=0; i<10; i++) {
+        for (let i=0; i<100; i++) {
             net.train(input, decisionCode, (factor));
         }
     // } else {
     //     if (state.v.x===10) {
     //         if ((state.food.x - state.snake[0].x) < 0) {
-    //             decisionCode = transpose(sub([1,1,1],decisionCode));
+    //             decisionCode = ANNmath.transpose(ANNmath.sub([1,1,1],decisionCode));
     //             decisionCode = decisionCode[0];
     //         }
     //     } else if (state.v.y===10) {
     //         if ((state.food.y - state.snake[0].y) < 0) {
-    //             decisionCode = transpose(sub([1,1,1],decisionCode));
+    //             decisionCode = ANNmath.transpose(ANNmath.sub([1,1,1],decisionCode));
     //             decisionCode = decisionCode[0];
     //         }
     //     } else if (state.v.x===-10) {
     //         if ((state.food.x - state.snake[0].x) > 0) {
-    //             decisionCode = transpose(sub([1,1,1],decisionCode));
+    //             decisionCode = ANNmath.transpose(ANNmath.sub([1,1,1],decisionCode));
     //             decisionCode = decisionCode[0];
     //         }
     //     } else if (state.v.y===-10) {
     //         if ((state.food.y - state.snake[0].y) > 0) {
-    //             decisionCode = transpose(sub([1,1,1],decisionCode));
+    //             decisionCode = ANNmath.transpose(ANNmath.sub([1,1,1],decisionCode));
     //             decisionCode = decisionCode[0];
     //         }
     //     }
@@ -81,29 +80,23 @@ function pathTrain(gotFood, path, state, net) {
     
 }
 
-function choosePlan(state, net, teller) {
+function choosePlan(state, net) {
     let randplan = setRandomPlan(state);
     let netplan = setNetworkPlan(state, net);
     if (randplan.gotFood && netplan.gotFood) {
         if (randplan.path.length < netplan.path.length) {
-            teller.innerHTML = 'Random';
             return randplan;
         } else {
-            teller.innerHTML = 'Network';
             return netplan;
         }
     } else if (randplan.gotFood) {
-        teller.innerHTML = 'Random';
         return randplan;
     } else if (netplan.gotFood) {
-        teller.innerHTML = 'Network';
         return netplan;
     } else {
         if (randplan.path.length > netplan.path.length) {
-            teller.innerHTML = 'Random';
             return randplan;
         } else {
-            teller.innerHTML = 'Network';
             return netplan;
         }
     }
@@ -183,7 +176,7 @@ function netInput(state) {
     }
     let hazard = {
         left: ((danger.N)&&(state.v.x===10))||((danger.E)&&(state.v.y===-10))||((danger.S)&&(state.v.x===-10))||((danger.W)&&(state.v.y===10)),
-        center: ((danger.N)&&(state.v.y===10))||((danger.E)&&(state.v.x===10))||((danger.S)&&(state.v.y===-10))||((danger.E)&&(state.v.y===-10)),
+        center: ((danger.N)&&(state.v.y===10))||((danger.E)&&(state.v.x===10))||((danger.S)&&(state.v.y===-10))||((danger.W)&&(state.v.x===-10)),
         right: ((danger.N)&&(state.v.x===-10))||((danger.E)&&(state.v.y===10))||((danger.S)&&(state.v.x===10))||((danger.W)&&(state.v.y===-10))
     };
 

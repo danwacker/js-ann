@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = 8081;
 const staticBasePath = 'C:/Users/Dan/Documents/Code Projects/HTML/ANN/';
-const main = require('handler.js');
+const handler = require('./handler.js');
 
 app.use(bodyParser.text({limit: '100mb', type: "text/plain"}));
 // app.use(bodyParser.json({limit: '100mb'}));
@@ -55,7 +55,7 @@ app.post('/*', (req, res) => {
         console.log('POST');
 
         var commandList = JSON.parse(req.body);
-        main(commandList);
+        handler.main(commandList);
 });
 
 app.listen(PORT, () =>{
